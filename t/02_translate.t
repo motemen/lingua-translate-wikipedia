@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use utf8;
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Lingua::Translate::Wikipedia;
 
 binmode Test::More->builder->output, ':utf8';
@@ -10,6 +10,7 @@ binmode Test::More->builder->output, ':utf8';
     my %Cases = (
         'Toradora!' => 'とらドラ!',
         'Akikan'    => 'アキカン!',
+        'FOOBAR_NOSUCHWORD' => 'FOOBAR_NOSUCHWORD',
     );
 
     my $t = Lingua::Translate::Wikipedia->new(from => 'en', to => 'ja');

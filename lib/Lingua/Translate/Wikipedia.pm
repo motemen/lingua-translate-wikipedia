@@ -2,9 +2,8 @@ package Lingua::Translate::Wikipedia;
 use strict;
 use warnings;
 use Carp;
-use LWP::UserAgent;
-use URI::Escape;
-use HTML::Entities;
+use URI;
+use Web::Scraper;
 
 our $VERSION = '0.01';
 
@@ -18,22 +17,24 @@ sub new {
 }
 
 sub translate {
-    my ($self, $text) = @_;
+    my ($self, $word) = @_;
 
-    if ($self->cache && defined (my $cached = $self->cache->get($text))) {
+    if ($self->cache && defined (my $cached = $self->cache->get($word))) {
         return $cached;
     }
 
-    my $res;
-    $res = $self->ua->get("http://$self->{src}.wikipedia.org/wiki/Special:Search?go=Go&search=" . uri_escape_utf8($text));
-    $res->decoded_content =~ m(<li class="interwiki-$self->{dest}"><a href="(http://$self->{dest}.wikipedia.org/wiki/.+?)">)
-        or return $self->may_cache($text => $text);
-    
-    $res = $self->ua->get($1);
-    $res->decoded_content =~ m'<h1[^>]*>(.+?)</h1>'
-        or return $self->may_cache($text => $text);
-    
-    $self->may_cache($text => decode_entities($1));
+    my $scraper = scraper {
+        process "li.interwiki-$self->{dest} a", link => ['@href', sub {
+            my $res = $Web::Scraper::UserAgent->get($_);
+            $res->code(200) if $res->code == 404;
+            scraper { process 'h1', title => 'TEXT' }->scrape($res);
+        }];
+    };
+    my $uri = URI->new("http://$self->{src}.wikipedia.org/wiki/Special:Search");
+       $uri->query_form(go => 'Go', search => $word);
+    my $res = $scraper->scrape($uri);
+
+    $self->may_cache($word => $res->{link}->{title} || $word);
 }
 
 sub correct {
@@ -49,11 +50,6 @@ sub may_cache {
 }
 
 sub cache { $_[0]->{cache} }
-
-sub ua {
-    my $self = shift;
-    $self->{ua} ||= LWP::UserAgent->new;
-}
 
 sub _canonicalize {
     my ($string) = @_;
