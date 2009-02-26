@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use utf8;
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Lingua::Translate::Wikipedia;
 
 binmode Test::More->builder->output, ':utf8';
@@ -23,6 +23,7 @@ binmode Test::More->builder->output, ':utf8';
     my %Cases = (
         '宇宙をかける少女' => 'Sora Kake Girl',
         '変愚蛮怒' => 'Hengband',
+        '魔女の宅急便' => 'Kiki\'s Delivery Service (novel)',
     );
 
     my $t = Lingua::Translate::Wikipedia->new(from => 'ja', to => 'en');
