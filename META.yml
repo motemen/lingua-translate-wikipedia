@@ -1,0 +1,23 @@
+---
+author: ~
+build_requires:
+  Cache::FileCache: 0
+  File::Temp: 0
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Lingua-Translate-Wikipedia
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  HTML::Entities: 0
+  LWP::UserAgent: 0
+  URI::Escape: 0
+resources:
+  license: http://dev.perl.org/licenses/
